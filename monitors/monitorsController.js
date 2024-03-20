@@ -4,8 +4,9 @@ import { ObjectId } from 'mongodb';
 
 export function createMonitor(req,res) {
   const {name, gradeReference} = req.body;
-  const monitor = new Monitor({name, gradeReference });
-
+  const validator = name + gradeReference.join(',')
+  const monitor = new Monitor({name, gradeReference, validator });
+  
   monitor.save()
     .then(() => {
 
@@ -72,5 +73,43 @@ export async function removeMonitor(req,res){
     res.status(200).json({ message: 'Monitor removido com sucesso' });
   } catch (error) {
       res.status(500).json({ error: 'Erro ao remover monitor: ' + error });
+  }
+}
+
+export async function suspendMonitor(req, res) {
+  try {
+    const monitorId = req.body._id;
+    const monitor = await Monitor.findOne({ _id: monitorId });
+
+    if (!monitor) {
+      return res.status(404).json({ message: 'Monitor não encontrado' });
+    }
+
+    monitor.status = 'suspended';
+
+    await monitor.save();
+
+    res.status(200).json({ message: 'Monitor suspenso com sucesso' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao suspender monitor: ' + error });
+  }
+}
+
+export async function activateMonitor(req, res) {
+  try {
+    const monitorId = req.body._id;
+    const monitor = await Monitor.findOne({ _id: monitorId });
+
+    if (!monitor) {
+      return res.status(404).json({ message: 'Monitor não encontrado' });
+    }
+
+    monitor.status = 'active';
+
+    await monitor.save();
+
+    res.status(200).json({ message: 'Monitor ativo com sucesso' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao ativar monitor: ' + error });
   }
 }

@@ -22,6 +22,29 @@ export function getAllGrades(req, res) {
     });
 }
 
+export async function getFilteredGrades(req, res) {
+  try {
+    const monitors = await Monitor.find();
+    const gradesWithMonitors = [];
+    const grades = await Grade.find();
+
+    for (const grade of grades) {
+        let timeSlot = grade._id
+        for (const monitor of monitors) {
+          if (monitor.gradeReference.includes(timeSlot) && monitor.status === "active") {
+            gradesWithMonitors.push(grade);
+            break;
+          }
+        }
+    }
+
+    res.json(gradesWithMonitors);
+  } catch (error) {
+    console.error('Erro ao buscar as grades com monitores:', error);
+    res.status(500).json({ error: 'Erro ao buscar as grades com monitores' });
+  }
+}
+
 export async function removeGrade(req,res){
   try {
 

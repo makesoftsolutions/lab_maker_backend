@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const gradeSchema = new mongoose.Schema({
   _id: Number,
-  description: String
+  description: {type: String, unique:true}
 
 });
 
